@@ -1,19 +1,22 @@
-import express from "express";
-import compression from "compression";
+const express = require('express')
+const compression = require('compression')
+const router = require('./src/router');
 
 const app = express();
-const port = 3000
-const json = {
-  fruit: 'Apple',
-  size: 'Large',
-  color: 'Red'
-}
+const port = process.env.PORT || 3000;
 
 app.use(compression());
 
-app.get('/', (_req, res) => {
-  res.json(json)
-})
+app.use((err, _req, res, _next) => {
+  const statusCode = err.statusCode || 500;
+  console.error(err.message, err.stack);
+  res.status(statusCode).json({'message': err.message});
+  
+  return;
+});
+
+app.use('/', router);
+
 
 const server = app.listen(port, () => console.log(`Example app listening on port ${port}`));
 
